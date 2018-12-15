@@ -2,15 +2,11 @@
 #include "ui_mainwindow.h"
 
 #include <QDesktopWidget>
-#include <QDir>
 #include <QFileDialog>
-#include <QFileInfo>
 #include <QMessageBox>
 #include <QDirIterator>
-#include <QtConcurrent/qtconcurrentrun.h>
 #include <QtConcurrent/QtConcurrentMap>
 #include <QtConcurrent/QtConcurrentFilter>
-#include <QFutureWatcher>
 
 main_window::main_window(QWidget *parent)
     : QMainWindow(parent)
@@ -28,17 +24,19 @@ main_window::main_window(QWidget *parent)
     ui->actionExit->setIcon(style.standardIcon(QCommonStyle::SP_DialogCloseButton));
     ui->actionAbout->setIcon(style.standardIcon(QCommonStyle::SP_DialogHelpButton));
 
-    connect(ui->actionIndex_Directory, &QAction::triggered, this, &main_window::select_directory);
+    connect(ui->actionIndex_Directory, &QAction::triggered, this, &main_window::indexDirectory);
     connect(ui->actionStop_indexing, &QAction::triggered, this, &main_window::stopIndexing);
     connect(ui->actionToggle_indexing, &QAction::triggered, this, &main_window::pauseIndexing);
     connect(ui->actionExit, &QAction::triggered, this, &QWidget::close);
     connect(ui->actionAbout, &QAction::triggered, this, &main_window::show_about_dialog);
-    connect(&result, SIGNAL(finished()), SLOT(indexingFinished()));
+    connect(&result, &QFutureWatcher<void>::finished, this, &main_window::indexingFinished);
     connect(&result, &QFutureWatcher<void>::progressRangeChanged, this->ui->progressBar, &QProgressBar::setRange);
     connect(&result, &QFutureWatcher<void>::progressValueChanged, this->ui->progressBar, &QProgressBar::setValue);
     connect(&result, &QFutureWatcher<void>::started, this->ui->progressBar, &QProgressBar::reset);
     connect(ui->lineEdit, &QLineEdit::textChanged, this, &main_window::patternChanged);
     connect(ui->searchButton, &QPushButton::clicked, this, &main_window::resolveSearch);
+
+    setWindowTitle("Prep-Grep");
 
     qRegisterMetaType<QVector<TrigramSet>>("QVector<TrigramSet>");
     qRegisterMetaType<QVector<QPair<int, QString>>>("QVector<QPair<int, QString>>");
@@ -98,10 +96,10 @@ void main_window::initSearch(QString const& pattern) {
 
 void main_window::handleResult(QString const& filename, QVector<QPair<int, QString>> entries) {
     QTreeWidgetItem* item = new QTreeWidgetItem(ui->treeWidget);
-    item->setText(0, QString("Found in ") + filename);
+    item->setText(0, QString("Found in ") + curdir.relativeFilePath(filename));
     for (auto it = entries.begin(); it != entries.end(); ++it) {
-        QTreeWidgetItem* childItem = new QTreeWidgetItem();
-        childItem->setText(0, QString("Line ") + QString::number(it->first) + QString(": ") + it->second);
+        QTreeWidgetItem* childItem = new QTreeWidgetItem(item);
+        childItem->setText(0, QString("Line ") + QString::number(it->first) + QString(": \n") + it->second);
         item->addChild(childItem);
     }
     ui->treeWidget->addTopLevelItem(item);
@@ -109,7 +107,7 @@ void main_window::handleResult(QString const& filename, QVector<QPair<int, QStri
 
 void main_window::searchingFinished() {
     ui->label->setText(QString("Search time: ") + QString::number(timer.elapsed() / 1000.0) + QString(" sec."));
-    if (ui->treeWidget->topLevelItem(0) == 0) {
+    if (!ui->treeWidget->topLevelItem(0)) {
         QTreeWidgetItem* item = new QTreeWidgetItem(ui->treeWidget);
         item->setText(0, QString("No entries"));
         ui->treeWidget->addTopLevelItem(item);
@@ -134,7 +132,7 @@ void main_window::pauseIndexing() {
 }
 
 void main_window::indexingFinished() {
-    QtConcurrent::blockingFilter(files, Trigram::isText);
+    QtConcurrent::blockingFilter(files, TrigramUtil::isText);
     ui->label->setText(QString("Indexing time: ") + QString::number(timer.elapsed() / 1000.0) +
                        QString("sec. Indexed files: " + QString::number(files.size()) + QString(".")));
     ui->lineEdit->setDisabled(false);
@@ -143,7 +141,7 @@ void main_window::indexingFinished() {
     ui->actionStop_indexing->setDisabled(true);
 }
 
-void main_window::select_directory() {
+void main_window::indexDirectory() {
     if (!searchThread.isFinished()) {
         searchThread.quit();
         searchThread.wait();
@@ -151,12 +149,12 @@ void main_window::select_directory() {
     QString dir = QFileDialog::getExistingDirectory(this, "Select Directory for Scanning",
                                                     QString(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
-    if (dir.length() > 0) {
-        scan_directory(dir);
+    if (dir.length() == 0) {
+        return;
     }
-}
 
-void main_window::scan_directory(QString const& dir) {
+    curdir = QDir(dir);
+    setWindowTitle(QString("Directory - %1").arg(dir));
     timer.start();
     ui->treeWidget->clear();
     ui->lineEdit->setDisabled(true);
@@ -171,7 +169,7 @@ void main_window::scan_directory(QString const& dir) {
     ui->actionIndex_Directory->setDisabled(true);
     ui->actionToggle_indexing->setDisabled(false);
     ui->actionStop_indexing->setDisabled(false);
-    result.setFuture(QtConcurrent::map(files, &Trigram::processFile));
+    result.setFuture(QtConcurrent::map(files, &TrigramUtil::processFile));
 }
 
 void main_window::show_about_dialog() {

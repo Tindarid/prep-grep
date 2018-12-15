@@ -5,12 +5,12 @@
 
 void Worker::doSearch(QVector<TrigramSet> const& files, QString const& pattern) {
     QThread* thread = QThread::currentThread();
-    TrigramSet patternSet = Trigram::processString(pattern);
+    TrigramSet patternSet = TrigramUtil::processString(pattern);
     for (int i = 0; i < files.size(); ++i) {
         if (thread->isInterruptionRequested()) {
             break;
         }
-        if (Trigram::isSubset(patternSet, files[i])) {
+        if (TrigramUtil::isSubset(patternSet, files[i])) {
             QString const& filename = files[i].filename;
             auto ans = findInFile(filename, pattern);
             if (!ans.empty()) {

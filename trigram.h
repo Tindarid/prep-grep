@@ -3,7 +3,6 @@
 
 #include <QSet>
 #include <QString>
-#include <QPair>
 #include <string>
 
 struct TrigramSet {
@@ -19,7 +18,7 @@ struct TrigramSet {
     }
 };
 
-class Trigram {
+class TrigramUtil {
 public:
     static const int MAX_TRIGRAMS = 20000;
     static const int MAX_LINE_LEN = 2000;

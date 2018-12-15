@@ -1,7 +1,7 @@
 #include "trigram.h"
 #include <fstream>
 
-bool Trigram::isSubset(TrigramSet const& a, TrigramSet const& b) {
+bool TrigramUtil::isSubset(TrigramSet const& a, TrigramSet const& b) {
     for (auto it = a.trigrams.begin(); it != a.trigrams.end(); ++it) {
         if (b.trigrams.find(*it) == b.trigrams.end()) {
             return false;
@@ -10,7 +10,7 @@ bool Trigram::isSubset(TrigramSet const& a, TrigramSet const& b) {
     return true;
 }
 
-void Trigram::processFile(TrigramSet& res) {
+void TrigramUtil::processFile(TrigramSet& res) {
     std::string filename = res.filename.toStdString();
     std::ifstream in(filename);
     if (!in.is_open()) {
@@ -35,14 +35,14 @@ void Trigram::processFile(TrigramSet& res) {
     res.good = true;
 }
 
-TrigramSet Trigram::processString(QString const& str) {
+TrigramSet TrigramUtil::processString(QString const& str) {
     TrigramSet res(str);
     addFromString(res, str.toStdString());
     res.good = true;
     return res;
 }
 
-bool Trigram::addFromString(TrigramSet& set, std::string const& str) {
+bool TrigramUtil::addFromString(TrigramSet& set, std::string const& str) {
     size_t len = str.length();
     if (len < 3) {
         return true;
@@ -64,7 +64,7 @@ bool Trigram::addFromString(TrigramSet& set, std::string const& str) {
     return true;
 }
 
-bool Trigram::validUTF8(quint32 a, quint32 b) {
+bool TrigramUtil::validUTF8(quint32 a, quint32 b) {
     // 1-byte, must be followed by 1-byte or first of multi-byte
     if (a < 0x80) {
         return b < 0x80 || (0xc0 <= b && b < 0xf8);
@@ -80,6 +80,6 @@ bool Trigram::validUTF8(quint32 a, quint32 b) {
     return false;
 }
 
-bool Trigram::isText(const TrigramSet& set) {
+bool TrigramUtil::isText(const TrigramSet& set) {
     return set.good;
 }

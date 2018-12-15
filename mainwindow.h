@@ -3,12 +3,13 @@
 
 #include <QMainWindow>
 #include <memory>
-#include "trigram.h"
-#include "worker.h"
 #include <QFutureWatcher>
 #include <QTime>
 #include <QCommonStyle>
 #include <QThread>
+#include <QDir>
+#include "trigram.h"
+#include "worker.h"
 
 namespace Ui {
 class MainWindow;
@@ -25,16 +26,15 @@ public:
     ~main_window();
 
 private slots:
-    void select_directory();
-    void scan_directory(QString const& dir);
+    void indexDirectory();
     void show_about_dialog();
     void indexingFinished();
     void stopIndexing();
     void pauseIndexing();
     void searchingFinished();
     void patternChanged();
-    void initSearch(QString const& pattern);
-    void handleResult(QString const& filename, QVector<QPair<int, QString>> entries);
+    void initSearch(QString const&);
+    void handleResult(QString const&, QVector<QPair<int, QString>>);
     void resolveSearch();
 
 signals:
@@ -46,6 +46,7 @@ private:
     QTime timer;
     QVector<TrigramSet> files;
     QCommonStyle style;
+    QDir curdir;
 };
 
 #endif // MAINWINDOW_H
