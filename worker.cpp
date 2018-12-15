@@ -2,6 +2,9 @@
 #include "trigram.h"
 #include <QThread>
 #include <fstream>
+#include <algorithm>
+#include <functional>
+#include <iostream>
 
 void Worker::doSearch(QVector<TrigramSet> const& files, QString const& pattern) {
     QThread* thread = QThread::currentThread();
@@ -37,7 +40,7 @@ QVector<QPair<QPair<int, int>, QString>> Worker::findInFile(QString const& filen
         }
         number++;
         std::getline(in, cur);
-        int count = bruteForce(cur, pat, patlen);
+        int count = boyer(cur, pat);
         if (count > 0) {
             ans.push_back(QPair<QPair<int, int>, QString>(QPair<int, int>(number, count), QString::fromStdString(cur)));
         }
@@ -62,4 +65,18 @@ int Worker::bruteForce(std::string const& text, std::string const& pattern, size
         }
     }
     return count;
+}
+
+int Worker::boyer(std::string const& text, std::string const& pattern) {
+    int ans = 0;
+    auto it = std::search(text.begin(), text.end(),
+                       std::boyer_moore_searcher(
+                           pattern.begin(), pattern.end()));
+    while (it != text.end()) {
+        ans++;
+        it = std::search(it + 1, text.end(),
+                       std::boyer_moore_searcher(
+                           pattern.begin(), pattern.end()));
+    }
+    return ans;
 }

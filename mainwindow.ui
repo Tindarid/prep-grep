@@ -47,6 +47,9 @@
           <property name="frameShadow">
            <enum>QFrame::Sunken</enum>
           </property>
+          <property name="digitCount">
+           <number>8</number>
+          </property>
           <property name="segmentStyle">
            <enum>QLCDNumber::Flat</enum>
           </property>
@@ -80,7 +83,7 @@
         <item>
          <widget class="QCheckBox" name="checkBox">
           <property name="toolTip">
-           <string>Smart search, which startx after changing search pattern (len &gt; 2)</string>
+           <string>Smart search, which start after changing search pattern (len &gt; 2)</string>
           </property>
           <property name="statusTip">
            <string/>
