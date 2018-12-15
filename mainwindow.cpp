@@ -16,7 +16,6 @@ main_window::main_window(QWidget *parent)
     setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), qApp->desktop()->availableGeometry()));
 
     ui->treeWidget->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-    ui->treeWidget->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
 
     ui->actionIndex_Directory->setIcon(style.standardIcon(QCommonStyle::SP_DialogOpenButton));
     ui->actionToggle_indexing->setIcon(style.standardIcon(QCommonStyle::SP_MediaPause));
@@ -39,7 +38,7 @@ main_window::main_window(QWidget *parent)
     setWindowTitle("Prep-Grep");
 
     qRegisterMetaType<QVector<TrigramSet>>("QVector<TrigramSet>");
-    qRegisterMetaType<QVector<QPair<int, QString>>>("QVector<QPair<int, QString>>");
+    qRegisterMetaType<QVector<QPair<int, QString>>>("QVector<QPair<QPair<int, int>, QString>>");
     searchThread.start();
     searchThread.quit();
     searchThread.wait();
@@ -78,7 +77,11 @@ void main_window::patternChanged() {
 }
 
 void main_window::initSearch(QString const& pattern) {
+    if (pattern.length() == 0) {
+        return;
+    }
     timer.start();
+    ui->lcdNumber->display(0);
     ui->treeWidget->clear();
     ui->label->setText("Searching...");
     ui->searchButton->setText("Stop");
@@ -94,14 +97,20 @@ void main_window::initSearch(QString const& pattern) {
     emit startSearching(files, pattern);
 }
 
-void main_window::handleResult(QString const& filename, QVector<QPair<int, QString>> entries) {
+void main_window::handleResult(QString const& filename, QVector<QPair<QPair<int, int>, QString>> entries) {
     QTreeWidgetItem* item = new QTreeWidgetItem(ui->treeWidget);
-    item->setText(0, QString("Found in ") + curdir.relativeFilePath(filename));
+    int count = 0;
     for (auto it = entries.begin(); it != entries.end(); ++it) {
         QTreeWidgetItem* childItem = new QTreeWidgetItem(item);
-        childItem->setText(0, QString("Line ") + QString::number(it->first) + QString(": \n") + it->second);
+        count += it->first.second;
+        childItem->setText(0, QString("Line ") + QString::number(it->first.first)
+                           + QString(", entries ") + QString::number(it->first.second)
+                           + QString(": \n") + it->second);
         item->addChild(childItem);
     }
+    item->setText(0, QString("Found ") + QString::number(count) +
+                  QString(" entries in ") + curdir.relativeFilePath(filename));
+    ui->lcdNumber->display(ui->lcdNumber->intValue() + count);
     ui->treeWidget->addTopLevelItem(item);
 }
 
@@ -135,10 +144,13 @@ void main_window::indexingFinished() {
     QtConcurrent::blockingFilter(files, TrigramUtil::isText);
     ui->label->setText(QString("Indexing time: ") + QString::number(timer.elapsed() / 1000.0) +
                        QString("sec. Indexed files: " + QString::number(files.size()) + QString(".")));
+    ui->progressBar->setHidden(true);
     ui->lineEdit->setDisabled(false);
     ui->actionIndex_Directory->setDisabled(false);
     ui->actionToggle_indexing->setDisabled(true);
     ui->actionStop_indexing->setDisabled(true);
+    ui->searchButton->setDisabled(false);
+    ui->lineEdit->setFocus();
 }
 
 void main_window::indexDirectory() {
@@ -159,6 +171,9 @@ void main_window::indexDirectory() {
     ui->treeWidget->clear();
     ui->lineEdit->setDisabled(true);
     ui->lineEdit->clear();
+    ui->progressBar->setHidden(false);
+    ui->searchButton->setDisabled(true);
+    ui->lcdNumber->display(0);
 
     QDirIterator it(dir, QDir::Hidden | QDir::Files | QDir::NoSymLinks, QDirIterator::Subdirectories);
     files.clear();

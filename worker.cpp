@@ -2,6 +2,7 @@
 #include "trigram.h"
 #include <QFile>
 #include <QTextStream>
+#include <QThread>
 
 void Worker::doSearch(QVector<TrigramSet> const& files, QString const& pattern) {
     QThread* thread = QThread::currentThread();
@@ -21,9 +22,9 @@ void Worker::doSearch(QVector<TrigramSet> const& files, QString const& pattern) 
     emit finished();
 }
 
-QVector<QPair<int, QString>> Worker::findInFile(QString const& filename, QString const& pattern) {
+QVector<QPair<QPair<int, int>, QString>> Worker::findInFile(QString const& filename, QString const& pattern) {
     QFile file(filename);
-    QVector<QPair<int, QString>> ans;
+    QVector<QPair<QPair<int, int>, QString>> ans;
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return ans;
     }
@@ -52,7 +53,7 @@ QVector<QPair<int, QString>> Worker::findInFile(QString const& filename, QString
             }
         }
         if (count > 0) {
-            ans.push_back(QPair<int, QString>(number, str));
+            ans.push_back(QPair<QPair<int, int>, QString>(QPair<int, int>(number, count), str));
         }
     }
     return ans;

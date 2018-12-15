@@ -34,7 +34,7 @@ private slots:
     void searchingFinished();
     void patternChanged();
     void initSearch(QString const&);
-    void handleResult(QString const&, QVector<QPair<int, QString>>);
+    void handleResult(QString const&, QVector<QPair<QPair<int, int>, QString>>);
     void resolveSearch();
 
 signals:
