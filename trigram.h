@@ -22,7 +22,7 @@ class TrigramUtil {
 public:
     static const int MAX_TRIGRAMS = 20000;
     static const int MAX_LINE_LEN = 2000;
-    static const int MAX_FILE_SIZE = 1 << 30;
+    //static const int MAX_FILE_SIZE = 1 << 30;
 
     static bool isSubset(TrigramSet const& subset, TrigramSet const& set);
     static void processFile(TrigramSet&);

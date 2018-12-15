@@ -16,7 +16,6 @@ void TrigramUtil::processFile(TrigramSet& res) {
     if (!in.is_open()) {
         return;
     }
-    //TODO MAX_FILE_SIZE
     std::string cur;
     while (!in.eof()) {
         std::getline(in, cur);

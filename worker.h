@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QVector>
 #include "trigram.h"
+#include <string>
 
 class Worker : public QObject
 {
@@ -11,6 +12,7 @@ class Worker : public QObject
 
 private:
     QVector<QPair<QPair<int, int>, QString>> findInFile(QString const& filename, QString const& pattern);
+    int bruteForce(std::string const& text, std::string const& pattern, size_t patlen);
 signals:
     void result(QString const& filename, QVector<QPair<QPair<int, int>, QString>> entries);
     void finished();

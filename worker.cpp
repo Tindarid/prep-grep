@@ -1,8 +1,7 @@
 #include "worker.h"
 #include "trigram.h"
-#include <QFile>
-#include <QTextStream>
 #include <QThread>
+#include <fstream>
 
 void Worker::doSearch(QVector<TrigramSet> const& files, QString const& pattern) {
     QThread* thread = QThread::currentThread();
@@ -23,38 +22,44 @@ void Worker::doSearch(QVector<TrigramSet> const& files, QString const& pattern) 
 }
 
 QVector<QPair<QPair<int, int>, QString>> Worker::findInFile(QString const& filename, QString const& pattern) {
-    QFile file(filename);
     QVector<QPair<QPair<int, int>, QString>> ans;
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    std::ifstream in(filename.toStdString());
+    if (!in.is_open()) {
         return ans;
     }
-    QTextStream in(&file);
-    int patlen = pattern.length();
+    std::string cur;
+    std::string pat = pattern.toStdString();
+    size_t patlen = pat.length();
     int number = 0;
-    while (!in.atEnd()) {
+    while (!in.eof()) {
         if (QThread::currentThread()->isInterruptionRequested()) {
             return ans;
         }
         number++;
-        QString str = in.readLine();
-        int count = 0;
-        for (int i = 0; i + patlen - 1 < str.length(); ++i) {
-            if (str[i] == pattern[0]) {
-                bool flag = true;
-                for (int j = 0; j < patlen; ++j) {
-                    if (pattern[j] != str[i + j]) {
-                        flag = false;
-                        break;
-                    }
-                }
-                if (flag) {
-                    count++;
-                }
-            }
-        }
+        std::getline(in, cur);
+        int count = bruteForce(cur, pat, patlen);
         if (count > 0) {
-            ans.push_back(QPair<QPair<int, int>, QString>(QPair<int, int>(number, count), str));
+            ans.push_back(QPair<QPair<int, int>, QString>(QPair<int, int>(number, count), QString::fromStdString(cur)));
         }
     }
     return ans;
+}
+
+int Worker::bruteForce(std::string const& text, std::string const& pattern, size_t patlen) {
+    int count = 0;
+    for (size_t i = 0; i + patlen - 1 < text.length(); ++i) {
+        if (text[i] == pattern[0]) {
+            bool flag = true;
+            for (size_t j = 0; j < patlen; ++j) {
+                if (pattern[j] != text[i + j]) {
+                    flag = false;
+                    break;
+                }
+            }
+            if (flag) {
+                count++;
+            }
+        }
+    }
+    return count;
 }
