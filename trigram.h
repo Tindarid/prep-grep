@@ -4,10 +4,11 @@
 #include <QSet>
 #include <QString>
 #include <QPair>
+#include <string>
 
 struct TrigramSet {
     QString filename;
-    QSet<quint64> trigrams;
+    QSet<quint32> trigrams;
     bool good;
     TrigramSet(QString const& str) {
         filename = str;
@@ -24,13 +25,13 @@ public:
     static const int MAX_LINE_LEN = 2000;
     static const int MAX_FILE_SIZE = 1 << 30;
 
-    static bool isSubset(TrigramSet& subset, TrigramSet& set);
+    static bool isSubset(TrigramSet const& subset, TrigramSet const& set);
     static void processFile(TrigramSet&);
     static TrigramSet processString(QString const& str);
     static bool isText(const TrigramSet& set);
-    static QVector<QPair<int, QString>> findInFile(QString& filename, QString& pattern);
 private:
-    static void addFromString(TrigramSet& set, QString const& str);
+    static bool addFromString(TrigramSet& set, std::string const& str);
+    static bool validUTF8(quint32 a, quint32 b);
 };
 
 #endif // TRIGRAM_H

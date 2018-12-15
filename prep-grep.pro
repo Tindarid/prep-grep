@@ -27,11 +27,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
     trigram.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    worker.cpp
 
 HEADERS += \
     trigram.h \
-    mainwindow.h
+    mainwindow.h \
+    worker.h
 
 FORMS += \
     mainwindow.ui

@@ -4,9 +4,11 @@
 #include <QMainWindow>
 #include <memory>
 #include "trigram.h"
+#include "worker.h"
 #include <QFutureWatcher>
 #include <QTime>
 #include <QCommonStyle>
+#include <QThread>
 
 namespace Ui {
 class MainWindow;
@@ -15,6 +17,8 @@ class MainWindow;
 class main_window : public QMainWindow
 {
     Q_OBJECT
+    QThread searchThread;
+    Worker* worker;
 
 public:
     explicit main_window(QWidget *parent = 0);
@@ -27,7 +31,14 @@ private slots:
     void indexingFinished();
     void stopIndexing();
     void pauseIndexing();
-    void startSearching();
+    void searchingFinished();
+    void patternChanged();
+    void initSearch(QString const& pattern);
+    void handleResult(QString const& filename, QVector<QPair<int, QString>> entries);
+    void resolveSearch();
+
+signals:
+    void startSearching(QVector<TrigramSet> const& files, QString const& pattern);
 
 private:
     std::unique_ptr<Ui::MainWindow> ui;
