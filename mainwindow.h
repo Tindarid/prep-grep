@@ -6,6 +6,7 @@
 #include "trigram.h"
 #include <QFutureWatcher>
 #include <QTime>
+#include <QCommonStyle>
 
 namespace Ui {
 class MainWindow;
@@ -31,9 +32,9 @@ private slots:
 private:
     std::unique_ptr<Ui::MainWindow> ui;
     QFutureWatcher<void> result;
-    QFutureWatcher<void> search;
     QTime timer;
     QVector<TrigramSet> files;
+    QCommonStyle style;
 };
 
 #endif // MAINWINDOW_H

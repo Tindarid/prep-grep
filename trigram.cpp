@@ -45,8 +45,13 @@ TrigramSet Trigram::processString(QString const& str) {
 }
 
 void Trigram::addFromString(TrigramSet& set, QString const& str) {
-    for (int i = 0; i + 2 < str.length(); ++i) {
-        set.trigrams.insert(std::make_pair(str[i], std::make_pair(str[i + 1], str[i + 2])));
+    int len = str.length();
+    QVector<quint64> temp(len);
+    for (int i = 0; i < len; ++i) {
+        temp[i] = str[i].unicode();
+    }
+    for (int i = 0; i + 2 < temp.size(); ++i) {
+        set.trigrams.insert((temp[i] << 32) | (temp[i + 1] << 16) | (temp[i + 2]));
     }
 }
 

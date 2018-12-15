@@ -28,7 +28,11 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QLineEdit" name="lineEdit"/>
+     <widget class="QLineEdit" name="lineEdit">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QTreeWidget" name="treeWidget">
@@ -110,10 +114,10 @@
     <property name="title">
      <string>Fi&amp;le</string>
     </property>
-    <addaction name="actionScan_Directory"/>
+    <addaction name="actionIndex_Directory"/>
     <addaction name="separator"/>
-    <addaction name="actionPause_process"/>
-    <addaction name="actionStop_process"/>
+    <addaction name="actionToggle_indexing"/>
+    <addaction name="actionStop_indexing"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -135,13 +139,16 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionScan_Directory"/>
-   <addaction name="actionPause_process"/>
-   <addaction name="actionStop_process"/>
+   <addaction name="actionIndex_Directory"/>
+   <addaction name="actionToggle_indexing"/>
+   <addaction name="actionStop_indexing"/>
   </widget>
-  <action name="actionScan_Directory">
+  <action name="actionIndex_Directory">
    <property name="text">
-    <string>&amp;Scan Directory...</string>
+    <string>&amp;Index Directory</string>
+   </property>
+   <property name="toolTip">
+    <string>Index Directory</string>
    </property>
   </action>
   <action name="actionExit">
@@ -154,14 +161,23 @@
     <string>&amp;About</string>
    </property>
   </action>
-  <action name="actionStop_process">
+  <action name="actionStop_indexing">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
-    <string>&amp;Stop process</string>
+    <string>&amp;Stop indexing</string>
    </property>
   </action>
-  <action name="actionPause_process">
+  <action name="actionToggle_indexing">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
-    <string>&amp;Pause_process</string>
+    <string>&amp;Toggle indexing</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle indexing</string>
    </property>
   </action>
  </widget>

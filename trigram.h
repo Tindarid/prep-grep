@@ -1,13 +1,13 @@
 #ifndef TRIGRAM_H
 #define TRIGRAM_H
 
-#include <set>
+#include <QSet>
 #include <QString>
 #include <QPair>
 
 struct TrigramSet {
     QString filename;
-    std::set<std::pair<QChar, std::pair<QChar, QChar>>> trigrams;
+    QSet<quint64> trigrams;
     bool good;
     TrigramSet(QString const& str) {
         filename = str;
