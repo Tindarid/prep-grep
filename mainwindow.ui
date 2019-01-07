@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="Line" name="line_2">
+       <widget class="Line" name="separator_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -27,7 +27,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QLineEdit" name="lineEdit">
+         <widget class="QLineEdit" name="pattern">
           <property name="enabled">
            <bool>false</bool>
           </property>
@@ -37,7 +37,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLCDNumber" name="lcdNumber">
+         <widget class="QLCDNumber" name="entries">
           <property name="toolTip">
            <string>Total entries</string>
           </property>
@@ -72,6 +72,12 @@
           <property name="shortcut">
            <string>Return</string>
           </property>
+          <property name="checkable">
+           <bool>false</bool>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
           <property name="default">
            <bool>false</bool>
           </property>
@@ -81,7 +87,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="checkBox">
+         <widget class="QCheckBox" name="smartSearch">
           <property name="toolTip">
            <string>Smart search, which start after changing search pattern (len &gt; 2)</string>
           </property>
@@ -129,14 +135,27 @@
        </widget>
       </item>
       <item>
-       <widget class="Line" name="line">
+       <widget class="QTextBrowser" name="entryBrowser">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>80</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="separator_1">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QProgressBar" name="progressBar">
+       <widget class="QProgressBar" name="progress">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -149,7 +168,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="status">
         <property name="toolTip">
          <string>Current info</string>
         </property>

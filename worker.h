@@ -13,10 +13,10 @@ class Worker : public QObject
 private:
     QVector<QPair<QPair<int, int>, QString>> findInFile(QString const& filename, QString const& pattern);
     int bruteForce(std::string const& text, std::string const& pattern, size_t patlen);
-    int boyer(std::string const& text, std::string const& pattern);
+    int boyerMoore(std::string const& text, std::string const& pattern);
 signals:
     void result(QString const& filename, QVector<QPair<QPair<int, int>, QString>> entries);
-    void finished();
+    void searchingFinished();
 public slots:
     void doSearch(QVector<TrigramSet> const& files, QString const& pattern);
 };

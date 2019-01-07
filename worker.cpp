@@ -4,7 +4,6 @@
 #include <fstream>
 #include <algorithm>
 #include <functional>
-#include <iostream>
 
 void Worker::doSearch(QVector<TrigramSet> const& files, QString const& pattern) {
     QThread* thread = QThread::currentThread();
@@ -21,7 +20,7 @@ void Worker::doSearch(QVector<TrigramSet> const& files, QString const& pattern) 
             }
         }
     }
-    emit finished();
+    emit searchingFinished();
 }
 
 QVector<QPair<QPair<int, int>, QString>> Worker::findInFile(QString const& filename, QString const& pattern) {
@@ -32,7 +31,6 @@ QVector<QPair<QPair<int, int>, QString>> Worker::findInFile(QString const& filen
     }
     std::string cur;
     std::string pat = pattern.toStdString();
-    size_t patlen = pat.length();
     int number = 0;
     while (!in.eof()) {
         if (QThread::currentThread()->isInterruptionRequested()) {
@@ -40,7 +38,7 @@ QVector<QPair<QPair<int, int>, QString>> Worker::findInFile(QString const& filen
         }
         number++;
         std::getline(in, cur);
-        int count = boyer(cur, pat);
+        int count = boyerMoore(cur, pat);
         if (count > 0) {
             ans.push_back(QPair<QPair<int, int>, QString>(QPair<int, int>(number, count), QString::fromStdString(cur)));
         }
@@ -67,7 +65,7 @@ int Worker::bruteForce(std::string const& text, std::string const& pattern, size
     return count;
 }
 
-int Worker::boyer(std::string const& text, std::string const& pattern) {
+int Worker::boyerMoore(std::string const& text, std::string const& pattern) {
     int ans = 0;
     auto it = std::search(text.begin(), text.end(),
                        std::boyer_moore_searcher(
